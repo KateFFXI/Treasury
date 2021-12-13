@@ -19,7 +19,7 @@ defaults.Delay = 1.73
 defaults.Verbose = false
 
 settings = config.load(defaults)
-
+ourdelay = 0
 duplicate_rare = false
 -------------------------------------------
 
@@ -168,6 +168,7 @@ function force_check()
 end
 
 function check(slot_index, item_id)
+	coroutine.sleep(1.1)
     if (code.drop:contains(item_id) or code.pass:contains(item_id)) and not code.lot:contains(item_id) then
         pass(item_id, slot_index)
     elseif code.lot:contains(item_id) then
@@ -325,6 +326,8 @@ stack_ids = S{0x01F, 0x020}
 last_stack_time = 0
 windower.register_event('incoming chunk', function(id, data)
     if id == 0x0D2 then
+			-- small_delay = ((math.random() + 1) / 2 * settings.Delay)
+			-- coroutine.sleep(small_delay)
         local treasure = packets.parse('incoming', data)
         check(treasure.Index, treasure.Item)
 
