@@ -167,14 +167,67 @@ function force_check()
     end
 end
 
+function check_lot(slot_index, item_id)
+	local inventory = windower.ffxi.get_items(inventory_id)
+	--		bags = {0,5,6,7}
+	bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16}
+	equip_bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16}
+	
+	if IsRare(item_id) then	-- Rare item so do duplicate check if flag is set
+		log('Rare item found in pool to lot.')
+		duplicate_rare = false
+		
+		if IsEquipable(item_id) then -- equippable in pool
+			log('Armor or weapon found in pool.')
+			for _,bag in ipairs(bags) do
+				local storage = windower.ffxi.get_items(equip_bags)
+				for _,item in ipairs(storage) do
+					if item.id > 0 then
+						if item.id == item_id then
+							duplicate_rare = true
+						end
+					end
+				end
+			end
+		else -- non equippable
+			for _,bag in ipairs(bags) do
+				local storage = windower.ffxi.get_items(bag)
+				for _,item in ipairs(storage) do
+					if item.id > 0 then
+						if item.id == item_id then
+							duplicate_rare = true
+						end
+					end
+				end
+			end
+		end
+		
+		if duplicate_rare == true then
+			log('Duplicate rare item found, passing.')
+			pass(item_id, slot_index)
+		else
+			log('No duplicate rare item found, lotting.')
+			if inventory.max - inventory.count > 1 then
+				lot(item_id, slot_index)
+			end
+		end
+	else -- Not rare item, so do regular parse for lotting.
+		log('Not rare item, lotting.')
+		if inventory.max - inventory.count > 1 then
+			lot(item_id, slot_index)
+		end
+	end
+end
+
 function check(slot_index, item_id)
 	coroutine.sleep(1.1)
     if (code.drop:contains(item_id) or code.pass:contains(item_id)) and not code.lot:contains(item_id) then
         pass(item_id, slot_index)
     elseif code.lot:contains(item_id) then
         local inventory = windower.ffxi.get_items(inventory_id)
-		bags = {0,5,6,7}
-		equip_bags = {0,1,2,4,5,6,7,8,9,10,11,12}
+		--		bags = {0,5,6,7}
+		bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16}
+		equip_bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16}
 		
 		if IsRare(item_id) then	-- Rare item so do duplicate check if flag is set
 			log('Rare item found in pool to lot.')
@@ -227,38 +280,13 @@ function IsEquipable(id) return S(res.items[id].flags):contains('Equippable') en
 
 function test(item_id)
 
-	local player_job = windower.ffxi.get_player()
-	local name = player_job.name
-	
-	sum = 0
-	for key in name:gmatch"." do
-		abc = string.byte(key)
-		sum = sum + abc
-	end
-	
-	local final = (((sum / string.len(name)) + string.len(name)) - (string.len(name) * 0.005))
-	if final < 0 then
-		final = final * -1
-	end
-	if final > 26 then
-		final = (final / string.len(name)) * 0.097185
-	end
-	-- bags = {0}
-	-- item_id = tonumber(item_id)
-	
-	-- for _,bag in ipairs(bags) do
-		-- local inventory = windower.ffxi.get_items(bag)
-		-- for _,item in ipairs(inventory) do
-			-- if item.id > 0 then
-				-- if item_id == item.id then
-					-- if IsEquipable(item.id) then
-						-- log('Equipable: ' .. item.id)
-					-- end
-				-- end
-			-- end
-		-- end
-	-- end
-	
+		for slot_index, item_table in pairs(windower.ffxi.get_items().treasure) do
+			log(slot_index .. 'S ' .. item_table.item_id .. ' ID')
+			--table.vprint(item_table)
+			check_lot(slot_index, item_table.item_id)
+            --windower.ffxi.lot_item(slot_index)
+        end
+
 end
 
 function find_id(name)
@@ -409,7 +437,8 @@ windower.register_event('addon command', function(command1, command2, ...)
 
     elseif command1 == 'lotall' then
         for slot_index, item_table in pairs(windower.ffxi.get_items().treasure) do
-            windower.ffxi.lot_item(slot_index)
+			check_lot(slot_index, item_table.item_id)
+            --windower.ffxi.lot_item(slot_index)
         end
 
     elseif command1 == 'clearall' then
