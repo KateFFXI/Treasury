@@ -1,6 +1,6 @@
 _addon.name = 'Treasury'
 _addon.author = 'Ihina(Original) - Modded by KateFFXI'
-_addon.version = '2.1.0'
+_addon.version = '2.1.6'
 _addon.commands = {'treasury', 'tr'}
 
 res = require('resources')
@@ -169,9 +169,9 @@ end
 
 function check_lot(slot_index, item_id)
 	local inventory = windower.ffxi.get_items(inventory_id)
-	--		bags = {0,5,6,7}
-	bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16}
-	equip_bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16}
+
+	bags = {0,1,2,4,5,6,7,9}	-- Non equipment
+	equip_bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16} -- All inventory
 	
 	if IsRare(item_id) then	-- Rare item so do duplicate check if flag is set
 		log('Rare item found in pool to lot.')
@@ -225,9 +225,9 @@ function check(slot_index, item_id)
         pass(item_id, slot_index)
     elseif code.lot:contains(item_id) then
         local inventory = windower.ffxi.get_items(inventory_id)
-		--		bags = {0,5,6,7}
-		bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16}
-		equip_bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16}
+		
+		bags = {0,1,2,4,5,6,7,9}	-- Non equipment
+		equip_bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16} -- All inventory
 		
 		if IsRare(item_id) then	-- Rare item so do duplicate check if flag is set
 			log('Rare item found in pool to lot.')
@@ -437,8 +437,8 @@ windower.register_event('addon command', function(command1, command2, ...)
 
     elseif command1 == 'lotall' then
         for slot_index, item_table in pairs(windower.ffxi.get_items().treasure) do
+			-- Checks for rare and passes if tries to lot.
 			check_lot(slot_index, item_table.item_id)
-            --windower.ffxi.lot_item(slot_index)
         end
 
     elseif command1 == 'clearall' then
