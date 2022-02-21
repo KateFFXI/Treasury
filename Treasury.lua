@@ -179,8 +179,8 @@ function check_lot(slot_index, item_id)
 		
 		if IsEquipable(item_id) then -- equippable in pool
 			log('Armor or weapon found in pool.')
-			for _,bag in ipairs(bags) do
-				local storage = windower.ffxi.get_items(equip_bags)
+			for _,bag in ipairs(equip_bags) do
+				local storage = windower.ffxi.get_items(bag)
 				for _,item in ipairs(storage) do
 					if item.id > 0 then
 						if item.id == item_id then
@@ -214,7 +214,7 @@ function check_lot(slot_index, item_id)
 	else -- Not rare item, so do regular parse for lotting.
 		log('Not rare item, lotting.')
 		if inventory.max - inventory.count > 1 then
-			lot(item_id, slot_index)
+			 windower.ffxi.lot_item(slot_index)
 		end
 	end
 end
