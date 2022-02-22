@@ -280,13 +280,6 @@ function IsEquipable(id) return S(res.items[id].flags):contains('Equippable') en
 
 function test(item_id)
 
-		for slot_index, item_table in pairs(windower.ffxi.get_items().treasure) do
-			log(slot_index .. 'S ' .. item_table.item_id .. ' ID')
-			--table.vprint(item_table)
-			check_lot(slot_index, item_table.item_id)
-            --windower.ffxi.lot_item(slot_index)
-        end
-
 end
 
 function find_id(name)
