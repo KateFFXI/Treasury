@@ -1,6 +1,6 @@
 _addon.name = 'Treasury'
 _addon.author = 'Ihina(Original) - Modded by KateFFXI'
-_addon.version = '2.1.6'
+_addon.version = '3.0'
 _addon.commands = {'treasury', 'tr'}
 
 res = require('resources')
