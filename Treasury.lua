@@ -261,7 +261,7 @@ function bags_contain(bags, item_id)
     for bag in bags:it() do
         local storage = windower.ffxi.get_items(bag.id)
         for _,item in ipairs(storage) do
-            if type(item)=='table' and type(item.id)=='number' and item.id > 0 then
+            if type(item)=='table' and type(item.id)=='number' and item.id == item_id then
                 return true
             end
         end
