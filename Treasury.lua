@@ -226,39 +226,21 @@ function check(slot_index, item_id)
     elseif code.lot:contains(item_id) then
         local inventory = windower.ffxi.get_items(inventory_id)
 		
-		bags = {0,1,2,4,5,6,7,9}	-- Non equipment
-		equip_bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16} -- All inventory
+		--bags = {0,1,2,4,5,6,7,9}	-- Non equipment
+		--equip_bags = {0,1,2,4,5,6,7,8,9,10,11,12,13,14,15,16} -- All inventory
+		all_bags = res.bags:access(functions.negate(functions.equals('Situational'))):en(functions.negate(functions.equals('Recycle')))
+		non_equipment_bags = all_bags:en(functions.negate(string.startswith+{'Wardrobe'}))
 		
 		if IsRare(item_id) then	-- Rare item so do duplicate check if flag is set
 			log('Rare item found in pool to lot.')
-			duplicate_rare = false
-			
-			if IsEquipable(item_id) then -- equippable in pool
+			local bags
+			if IsEquipable(item_id) then
 				log('Armor or weapon found in pool.')
-				for _,bag in ipairs(bags) do
-					local storage = windower.ffxi.get_items(equip_bags)
-					for _,item in ipairs(storage) do
-						if item.id > 0 then
-							if item.id == item_id then
-								duplicate_rare = true
-							end
-						end
-					end
-				end
-			else -- non equippable
-				for _,bag in ipairs(bags) do
-					local storage = windower.ffxi.get_items(bag)
-					for _,item in ipairs(storage) do
-						if item.id > 0 then
-							if item.id == item_id then
-								duplicate_rare = true
-							end
-						end
-					end
-				end
+				bags = all_bags
+			else
+				bags = non_equipment_bags
 			end
-			
-			if duplicate_rare == true then
+			if bags_contain(bags, item_id) then
 				log('Duplicate rare item found, passing.')
 				pass(item_id, slot_index)
 			else
@@ -272,6 +254,17 @@ function check(slot_index, item_id)
 				lot(item_id, slot_index)
 			end
 		end
+    end
+end
+
+function bags_contain(bags, item_id)
+    for bag in bags:it() do
+        local storage = windower.ffxi.get_items(bag.id)
+        for _,item in ipairs(storage) do
+            if type(item)=='table' and type(item.id)=='number' and item.id > 0 then
+                return true
+            end
+        end
     end
 end
 
