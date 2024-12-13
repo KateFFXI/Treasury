@@ -268,7 +268,15 @@ function bags_contain(bags, item_id)
     end
 end
 
-function IsRare(id) return S(res.items[id].flags):contains('Rare') end
+function IsRare(id)
+	if id then
+		log('Rare ID: '..id)
+		return S(res.items[id].flags):contains('Rare') 
+	else
+		return false
+	end
+end
+
 function IsEquipable(id) return S(res.items[id].flags):contains('Equippable') end
 
 function test(item_id)
